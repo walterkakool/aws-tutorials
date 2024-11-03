@@ -13,7 +13,8 @@ aws_linux_walkk
 # Github repo set-up tutorial
 If you would like to quickly learn how to set up a Github repository, this is the tutorial I made for my sophomores\
 in my CSC322 group project as their team lead during my last term at UVic:\
-https://youtu.be/KYdwu_zLXec?si=KNOLvxa3vbwfyRhZ\
+https://youtu.be/KYdwu_zLXec?si=KNOLvxa3vbwfyRhZ
+\
 # EC2 instance set up 
 https://youtu.be/dZ2KgZ5zPdg
 
@@ -46,10 +47,17 @@ https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
 **• JupyterNotebook fetch-ups:**
 
 ![notebook-fetchup!](https://s3-walkk.s3.us-east-1.amazonaws.com/Notebook-fetchup.PNG)
+\
+Link:\
+https://s3-walkk.s3.us-east-1.amazonaws.com/Notebook-fetchup.PNG
 
 **• MySQL fetch-ups:**
 \
 \
 ![linux_out!](https://s3-walkk.s3.us-east-1.amazonaws.com/linux_out.PNG)
+\
+Link:\
+https://s3-walkk.s3.us-east-1.amazonaws.com/linux_out.PNG
+\
 \
 **Note: Images powered by AWS S3 Bucket.**
