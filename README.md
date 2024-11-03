@@ -33,7 +33,7 @@ If it has that, the whole name of the rpm package will be printed out, besideds 
 
 # VPC config (Notebook_EC2_RDS.ipynb)
 It teaches you how to set up a jump box EC2, subnets, VPCs, route tables, MySQL database. Then use a JupyterNotebook to play with it:\
-~~https://youtu.be/HDnR8hs7F_8?si=-jqr-Jdrv3fo2UjD~~
+https://youtu.be/cWzT9-Q76Es
 
 ## Important point-outs:
 • For installing Openssl11 (manually):\
