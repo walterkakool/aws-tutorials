@@ -41,3 +41,9 @@ It teaches you how to set up a jump box EC2, subnets, VPCs, route tables, MySQL 
 `sudo yum localinstall compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 • Redhat MySQL repo:\
 https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+## Outcomes
+**• JupyterNotebook fetch-ups:**
+
+![notebook-fetchup!](https://s3-walkk.s3.us-east-1.amazonaws.com/Notebook-fetchup.PNG)
+
+**• MySQL fetch-ups:**
