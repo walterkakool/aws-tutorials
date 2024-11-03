@@ -40,6 +40,7 @@ It teaches you how to set up a jump box EC2, subnets, VPCs, route tables, MySQL 
 `wget https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 `sudo yum localinstall compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 • Redhat MySQL repo:\
+
 https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
 ## Outcomes
 **• JupyterNotebook fetch-ups:**
@@ -47,3 +48,8 @@ https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
 ![notebook-fetchup!](https://s3-walkk.s3.us-east-1.amazonaws.com/Notebook-fetchup.PNG)
 
 **• MySQL fetch-ups:**
+\
+\
+![linux_out!](https://s3-walkk.s3.us-east-1.amazonaws.com/linux_out.PNG)
+\
+**Note: Images powered by AWS S3 Bucket.**
