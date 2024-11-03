@@ -40,4 +40,4 @@ https://youtu.be/HDnR8hs7F_8?si=-jqr-Jdrv3fo2UjD
 `wget https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 `sudo yum localinstall compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 • Redhat MySQL repo:\
-https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+~~https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm~~
