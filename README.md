@@ -46,10 +46,10 @@ https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
 ## Outcomes
 **• JupyterNotebook fetch-ups:**
 
-![notebook-fetchup!](https://s3-walkk.s3.us-east-1.amazonaws.com/Notebook-fetchup.PNG)
+![notebook-fetchup!](https://s3-walkk.s3.us-east-1.amazonaws.com/notebook_out.PNG)
 \
 Link:\
-https://s3-walkk.s3.us-east-1.amazonaws.com/Notebook-fetchup.PNG
+https://s3-walkk.s3.us-east-1.amazonaws.com/notebook_out.PNG
 
 **• MySQL fetch-ups:**
 \
