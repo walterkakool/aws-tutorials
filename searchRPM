@@ -1,0 +1,25 @@
+#!/bin/bash
+dollr_at=""
+search_sub=$2
+if [[ "$1" =~ [0-9]+ ]]
+then
+
+        dollr_at=$(yum list installed | awk -v dollr_index="$1" '{print $dollr_index}')
+
+fi
+
+f_counts=0
+
+
+for dollr in ${dollr_at[@]}
+do
+        ((++f_counts))
+        if [[ $dollr =~ .*$search_sub.* ]]
+        then
+                echo $dollr
+        fi
+
+done
+
+printf "Total searching:\n"
+echo "$f_counts"
