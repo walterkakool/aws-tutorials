@@ -16,13 +16,13 @@ in my CSC322 group project as their team lead during my last term at UVic:\
 https://youtu.be/KYdwu_zLXec?si=KNOLvxa3vbwfyRhZ
 
 # EC2 instance set up 
-https://youtu.be/dZ2KgZ5zPdg
+(Under construction)
 
 # Docker escalates compiling
-https://youtu.be/LTXb6Z7WVOo
+(Under construction)
 
 # Lambda ( C++ && python )
-https://youtu.be/9jojNZMOPWU
+(Under construction)
 
 # Usage of searchRPM script
 `sudo chmod +x ./searchRPM`\
