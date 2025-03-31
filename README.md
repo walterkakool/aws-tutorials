@@ -36,12 +36,11 @@ If it has that, the whole name of the rpm package will be printed out, besideds 
 It teaches you how to set up a jump box EC2, subnets, VPCs, route tables, MySQL database. Then use a JupyterNotebook to play with it:\
 https://youtu.be/cWzT9-Q76Es
 
-## Important point-outs:
+## MySQL installation on plane EC2 instances:
 • For installing Openssl11 (manually):\
 `wget https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 `sudo yum localinstall compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 • Redhat MySQL repo:\
-
 https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
 ## Outcomes
 **• JupyterNotebook fetch-ups:**
