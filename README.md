@@ -42,6 +42,14 @@ https://youtu.be/cWzT9-Q76Es
 `sudo yum localinstall compat-openssl11-1.1.1k-3.el9.x86_64.rpm`\
 • Redhat MySQL repo:\
 https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+
+`sudo wget https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm`\
+`sudo rpm -Uvh mysql84-community-release-el9-1.noarch.rpm`\
+• Flags explanations:\
+\-U is for upgrade.\
+\-v is for verbose.\
+\-h is for displaying #.\
+`sudo yum install mysql-community-server`
 ## Outcomes
 **• JupyterNotebook fetch-ups:**
 
