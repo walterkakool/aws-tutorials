@@ -73,7 +73,7 @@ def sendEmail(
     smtp_port = 465
     sender_email = "walkk@walterkakool.ca"
     sender_password = "" 
-    recipient_email = "walter.kakool@unb"
+    recipient_email = "walter.kakool@unb.ca"
 
     msg["From"] = sdr
     msg["To"]   = sdr
