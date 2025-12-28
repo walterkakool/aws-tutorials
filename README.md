@@ -1,6 +1,7 @@
 # Current ticket (regarding an online multi-players Blackjack mobile game)
-• Figuring out a C++ executable to delete all instances in AWS Lambda;\
-• Sub-path coming up;
+• Trop paresseux pour nouvelle l'IU (UI in English); je prend mon script pour SMTP et IMAP en AWS;
+• ~~Figuring out a C++ executable to delete all instances in AWS Lambda;~~\
+• ~~Sub-path coming up;~~
 
 # Quick-start of CIDR
 Given two IPv4s, which are 11.11.10.0/23 and 11.11.11.0/23, the netmask for both of these is 255.255.254.0. Since /23 states that the first 23 digits (big-endian) are fixed, 11111111.11111111.11111110.00000000 (255.255.254.0)\
