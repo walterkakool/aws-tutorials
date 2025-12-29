@@ -31,10 +31,13 @@ def lambda_handler(event, context):
                 ).parsebytes(
                     response['Body'].read())
 
+    #Test cases
     emailsrc  = getSrc(rawmsg)     
     bdtxt     = getBody(rawmsg)
     fnldest   = getDes(bdtxt, despattern) 
 
+    getAttch(rawmsg)
+    #Printing out contents in test cases 
     try:
         print("\n***Email source***\n", 
                 emailsrc[2],
@@ -51,45 +54,7 @@ def lambda_handler(event, context):
         ) 
 
     except:
-        print("\nFailed on fnldest[2]\n")           
-
-    send_email_via_workmail()
-
-def sendEmail(
-                server, #""
-                port,   #int
-                msg):
-
-    srv          = server
-    prt          = port
-    sdr          = sender
-    sdpssw       = send_password
-    repnt        = recipient
-    txt          = text
-
-    msg          = MIMEMultipart()
-
-    smtp_server = "smtp.mail.us-east-1.awsapps.com" 
-    smtp_port = 465
-    sender_email = "walkk@walterkakool.ca"
-    sender_password = "" 
-    recipient_email = "walter.kakool@unb.ca"
-
-    msg["From"] = sdr
-    msg["To"]   = sdr
-    msg["Subject"] = txt[0]
-    msg.attach(MIMEText(txt[1], "plain"))    #Only body text
-
-    try:
-        ses.send_raw_email(
-            Source=sender_email,
-            Destinations=[recipient_email],
-            RawMessage={'Data': message.as_string()}
-        )
-
-    except Exception as e:
-        print(f"Error: {e}")   
-
+        print("\nFailed on fnldest[2]\n")        
 
 def getWalkkmailSpn(event):
     
@@ -125,6 +90,48 @@ def getSrc(rawmsg):
  
 def getDes(bdtxt, despattern):
     return re.search(despattern, bdtxt)
+
+
+
+def sendEmail(
+                server, #""
+                port,   #int
+                msg):
+
+    srv          = server
+    prt          = port
+    sdr          = sender
+    sdpssw       = send_password
+    repnt        = recipient
+    txt          = text
+
+    msg          = MIMEMultipart()
+
+    smtp_server = "smtp.mail.us-east-1.awsapps.com" 
+    smtp_port = 465
+    sender_email = "walkk@walterkakool.ca"
+    sender_password = "" 
+    recipient_email = "walter.kakool@unb"
+
+    msg["From"] = sdr
+    msg["To"]   = sdr
+    msg["Subject"] = txt[0]
+    msg.attach(MIMEText(txt[1], "plain"))    #Only body text
+
+    try:
+        ses.send_raw_email(
+            Source=sender_email,
+            Destinations=[recipient_email],
+            RawMessage={'Data': message.as_string()}
+        )
+
+    except Exception as e:
+        print(f"Error: {e}")   
+
+
+def receiveEmail():
+    
+    return 0 
 
 def getAttch(rawmsg):
     extracted_files = []
@@ -173,7 +180,3 @@ def getAttch(rawmsg):
         return 1
 
     return 0           
-
-def receiveEmail():
-    
-    return 0
