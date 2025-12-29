@@ -36,7 +36,7 @@ def lambda_handler(event, context):
     bdtxt     = getBody(rawmsg)
     fnldest   = getDes(bdtxt, despattern) 
 
-    getAttch(rawmsg)
+    attchrepn = getAttch(rawmsg)
     #Printing out contents in test cases 
     try:
         print("\n***Email source***\n", 
@@ -48,13 +48,22 @@ def lambda_handler(event, context):
         print("\nFailed on emailsrc[2]\n") 
 
     try:
+        print("\n***Printing attchrepn***\n", 
+                attchrepn,
+              "\n***Printing attchrepn***\n"
+        ) 
+
+    except:
+        print("\nFailed on attchrepn\n")   
+
+    try:
         print("\n***Final destination***\n", 
                 fnldest[2],
               "\n***Final destination***\n"
         ) 
 
     except:
-        print("\nFailed on fnldest[2]\n")        
+        print("\nFailed on fnldest[2]\n")                     
 
 def getWalkkmailSpn(event):
     
