@@ -126,6 +126,54 @@ def getSrc(rawmsg):
 def getDes(bdtxt, despattern):
     return re.search(despattern, bdtxt)
 
+def getAttch(rawmsg):
+    extracted_files = []
+    msg = rawmsg
+
+    try:
+        if msg.is_multipart():
+            for part in msg.walk():
+                if part.get_content_maintype() == 'multipart':
+                    continue
+
+                content_disposition = part.get("Content-Disposition", 
+                                               None
+                                      )
+                
+                if content_disposition:
+                    disposition_type = content_disposition.strip().split(";")[0].lower()
+                    
+                    if disposition_type in ('attachment', 'inline'):
+                        filename = part.get_filename()
+                        
+                        if filename:
+                            print(f"Found attachment: {filename}")
+                            file_payload = part.get_content()
+                            
+                            destination_key = f"extracted/{os.path.basename(filename)}"
+                            
+                            s3.put_object(
+                                Bucket=source_bucket,
+                                Key=destination_key,
+                                Body=file_payload
+                            )
+                            extracted_files.append(destination_key)
+        else:
+            print("Email has no attachments.")
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps(f"Success. Attachment extracted: {extracted_files}")
+        }
+
+    except Exception as e:
+        print(f"Errors processing email: {str(e)}")
+        raise e
+
+        return 1
+
+    return 0           
+
 def receiveEmail():
     
     return 0
