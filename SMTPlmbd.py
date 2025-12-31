@@ -161,11 +161,11 @@ def getAttch(rawmsg):
                             objkey = f"extracted/{os.path.basename(filename)}"
                             
                             s3.put_object(
-                                Bucket="walkkmailattchsss",
+                                Bucket="walkkmailattch",
                                 Key=objkey,
                                 Body=extractionattch
                             )
-                            extracted_files.append(destination_key)
+                            extracted_files.append(objkey)
         else:
             return "Email has no attachments."
             #print("Email has no attachments.")
