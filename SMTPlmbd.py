@@ -1,3 +1,4 @@
+import logging
 import smtplib
 import ssl
 from email.mime.text import MIMEText
@@ -18,6 +19,7 @@ s3 = boto3.client('s3')
 ses = boto3.client('ses')
 
 def lambda_handler(event, context):
+
     despattern = r"(---Final destination---)([\s\S]+)(---Final destination---)"
     bdpattern = r"(---Final destination---)([\s\S]+)(---Final destination---)([\s\S]+)"
     fnldest = ''        #Final destination 
@@ -36,25 +38,44 @@ def lambda_handler(event, context):
     bdtxt     = getBody(rawmsg)
     fnldest   = getDes(bdtxt, despattern) 
 
+    bdtxt     = re.search(bdpattern, 
+                          bdtxt
+                ) 
+
     attchrepn = getAttch(rawmsg)
     #Printing out contents in test cases 
+
     try:
+        print("\n***Current object in walkkmail:***\n",
+          event['Records'][0]
+               ['s3']['object']
+               ['key'],
+          "\n***Current object in walkkmail:***\n"
+        )
+
+    except Exception as e:
+        print(f"***Current object enounter errors:\n",
+              f"{e}***\n"
+        )  
+
+    try:
+        
         print("\n***Email source***\n", 
                 emailsrc[2],
               "\n***Email source***\n"
         ) 
 
     except:
-        print("\nFailed on emailsrc[2]\n") 
+        print("\n***Failed on emailsrc[2]***\n") 
 
-    try:
-        print("\n***Printing attchrepn***\n", 
-                attchrepn,
-              "\n***Printing attchrepn***\n"
+    try:      
+        print("\n***Email plain content body***\n",
+               bdtxt[4],
+              "\n***Email plain content body***\n"
         ) 
 
     except:
-        print("\nFailed on attchrepn\n")   
+        print("\n***Failed on bdtxt[4]***\n")         
 
     try:
         print("\n***Final destination***\n", 
@@ -63,7 +84,18 @@ def lambda_handler(event, context):
         ) 
 
     except:
-        print("\nFailed on fnldest[2]\n")                     
+        print("\n***Failed on fnldest[2]***\n")         
+
+    try:
+        print("\n***Printing attchrepn return***\n", 
+                attchrepn,
+              "\n***Printing attchrepn return***\n"
+        ) 
+
+    except:
+        print("\n***Failed on attchrepn***\n")   
+
+                          
 
 def getWalkkmailSpn(event):
     
@@ -100,6 +132,69 @@ def getSrc(rawmsg):
 def getDes(bdtxt, despattern):
     return re.search(despattern, bdtxt)
 
+def getAttch(rawmsg):
+    extracted_files = []
+    msg = rawmsg
+
+    returnstr = ""
+
+    try:
+        if msg.is_multipart():
+            for part in msg.walk():
+                if part.get_content_maintype() == 'multipart':
+                    continue
+
+                content_disposition = part.get("Content-Disposition", 
+                                               None
+                                      )
+                
+                if content_disposition:
+                    disposition_type = content_disposition.strip().split(";")[0].lower()
+                    
+                    if disposition_type in ('attachment', 'inline'):
+                        filename = part.get_filename()
+                        
+                        if filename:
+                            print(f"Found attachment: {filename}")
+                            extractionattch = part.get_content()
+                            
+                            objkey = f"extracted/{os.path.basename(filename)}"
+                            
+                            s3.put_object(
+                                Bucket="walkkmailattchsss",
+                                Key=objkey,
+                                Body=extractionattch
+                            )
+                            extracted_files.append(destination_key)
+        else:
+            return "Email has no attachments."
+            #print("Email has no attachments.")
+
+        returnstr  = "{\n"
+        returnstr += "'Function':'getAttch'\n"
+        returnstr += "'Return': 0,\n"
+        returnstr += "'Attachments':"
+        returnstr += f"{extracted_files}"
+        returnstr += "\n}\n"
+
+        return returnstr
+
+
+    except Exception as e:
+
+        returnstr  = "{\n"
+        returnstr += "'Function':'getAttch'\n"
+        returnstr += "'Return': 1,\n"
+        returnstr += f"'Errors': {e}"
+        returnstr += "\n}\n"  
+
+        return returnstr     
+
+
+
+def receiveEmail():
+    
+    return 0 
 
 
 def sendEmail(
@@ -135,57 +230,4 @@ def sendEmail(
         )
 
     except Exception as e:
-        print(f"Error: {e}")   
-
-
-def receiveEmail():
-    
-    return 0 
-
-def getAttch(rawmsg):
-    extracted_files = []
-    msg = rawmsg
-
-    try:
-        if msg.is_multipart():
-            for part in msg.walk():
-                if part.get_content_maintype() == 'multipart':
-                    continue
-
-                content_disposition = part.get("Content-Disposition", 
-                                               None
-                                      )
-                
-                if content_disposition:
-                    disposition_type = content_disposition.strip().split(";")[0].lower()
-                    
-                    if disposition_type in ('attachment', 'inline'):
-                        filename = part.get_filename()
-                        
-                        if filename:
-                            print(f"Found attachment: {filename}")
-                            file_payload = part.get_content()
-                            
-                            destination_key = f"extracted/{os.path.basename(filename)}"
-                            
-                            s3.put_object(
-                                Bucket=source_bucket,
-                                Key=destination_key,
-                                Body=file_payload
-                            )
-                            extracted_files.append(destination_key)
-        else:
-            print("Email has no attachments.")
-
-        return {
-            'statusCode': 200,
-            'body': json.dumps(f"Success. Attachment extracted: {extracted_files}")
-        }
-
-    except Exception as e:
-        print(f"Errors processing email: {str(e)}")
-        raise e
-
-        return 1
-
-    return 0           
+        print(f"Error: {e}")                  
