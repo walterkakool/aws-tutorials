@@ -1,4 +1,5 @@
 # Current ticket (regarding an online multi-players Blackjack mobile game)
+• No mood for Jobless Science; backing to my study. Bisou bisou.\
 • Trop paresseux pour nouvelle l'IU (UI in English); je prend mon script pour SMTP et IMAP en AWS;\
 • ~~Figuring out a C++ executable to delete all instances in AWS Lambda;~~\
 • ~~Sub-path coming up;~~
