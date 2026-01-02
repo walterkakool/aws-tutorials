@@ -19,46 +19,39 @@ s3 = boto3.client('s3')
 ses = boto3.client('ses')
 #Final destination pattern
 despattern = r"(---Final destination---)([\s\S]+)(---Final destination---)"
+#Bastion sender pattern
+bspattern = r"([\s\S]+)(---Bastion---)([\s\S]+)(---Bastion---)"
 #Body content pattern
-bdpattern = r"(---Final destination---)([\s\S]+)(---Final destination---)([\s\S]+)"
+bdpattern  = f"{bspattern}" + r"([\s\S]+)"
 
 def lambda_handler(event, context):
-
-    #despattern = r"(---Final destination---)([\s\S]+)(---Final destination---)"
-    #bdpattern = r"(---Final destination---)([\s\S]+)(---Final destination---)([\s\S]+)"
-    fnldest = ''        #Final destination 
-    bdtxt = ''          #Body content
-    attch = []          #Attachment
 
     response  = getWalkkmailSpn(event)
 
     rawmsg    = BytesParser(
                   policy=policy.default
                 ).parsebytes(
-                    response['Body'].read())
+                    response['Body'].read()
+                  )
 
-    emailsrc  = getSrc(rawmsg) 
+    bdtxt     = getBody(rawmsg) 
+
+    bastion   = getBastion(bdtxt,
+                           bspattern
+                ) 
 
     try:
-        
-        print("\n***Email source***\n", 
-                emailsrc[2],
-              "\n^^^Email source^^^\n"
+        print("\n***Bastion***\n", 
+                bastion[3],
+              "\n^^^Bastion^^^\n"
         ) 
 
     except:
-        print("\n***Failed on emailsrc[2]***\n")                     
+        print("\n***Failed on bastion[3]***\n") 
 
     try:
         print("\n***Sending email***\n")
-
-        sendEmail(
-            "smtp.mail.us-east-1.awsapps.com",
-            465,
-            "walkk@walterkakool.ca",
-            rawmsg
-        )
-
+        sendEmail(rawmsg)
         print("\n^^^Email sent^^^\n")
 
     except Exception as e:
@@ -66,7 +59,6 @@ def lambda_handler(event, context):
                 f"{e}",
                 "\n^^^sendEmail errors^^^\n"
         ) 
-         
 
 def getWalkkmailSpn(event):
     
@@ -104,14 +96,25 @@ def getSrc(rawmsg):
                rawmsg.get('From')
              )
     return result
+
+def getBastion(bdtxt, bspattern):
+    
+    return re.search(bspattern, bdtxt) 
  
 def getDes(bdtxt, despattern):
     return re.search(despattern, bdtxt)
 
 def getAttch(rawmsg):
     extracted_files = []
-    msg = rawmsg
+    msg       = rawmsg
+    bdtxt     = getBody(msg)
 
+    bastion   = getBastion(bdtxt,
+                           bspattern
+                ) 
+
+    attchBuck  = "" if bastion[3][2:-2] == "walkk@walterkakool.ca" else ""
+    
     returnstr = ""
 
     try:
@@ -137,7 +140,7 @@ def getAttch(rawmsg):
                             objkey = f"{os.path.basename(filename)}"
                             
                             s3.put_object(
-                                Bucket="walkkmailattch",
+                                Bucket=attchBuck,
                                 Key=objkey,
                                 Body=extractionattch
                             )
@@ -166,45 +169,42 @@ def getAttch(rawmsg):
         return returnstr     
 
 
-
-def receiveEmail():
-    
-    return 0 
-
-
-def sendEmail(  server, #"";  "smtp.mail.us-east-1.awsapps.com" 
-                port,   #int; 465
-                sdr,    #"";  "walkk@walterkakool.ca"
-                rawmsg, #BytesParser
-):
-    inmsg       = rawmsg
+def sendEmail(rawmsg):
+    inmsg     = rawmsg
     emailsrc  = getSrc(inmsg)
+    outmsg    = MIMEMultipart()
 
-    outmsg = MIMEMultipart()
-
-    if emailsrc[2] == "walter.kakool@unb.ca":
-
-        bdtxt     = getBody(inmsg)        #This has final destination
+    if emailsrc[2] == "walterthaim@hotmail.com":
+        #This has final destination && bastion
+        bdtxt     = getBody(inmsg)        
 
         fnldest   = getDes(bdtxt,
                            despattern
                     ) 
 
-        #No final destination inside
+        bastion   = getBastion(bdtxt,
+                               bspattern
+                    ) 
+
+        #No final destination inside; [5]
         bdtxt     = re.search(bdpattern, 
                               bdtxt
                     )
 
         outmsg['Subject'] = rawmsg.get('Subject')
-        outmsg['From']    = sdr
+        bastionsdr        = bastion[3][2:-2]
+        outmsg['From']    = bastionsdr
         recepient         = fnldest[2][2:-2]
+        attchBuck         = "" if bastion[3][2:-2] == "walkk@walterkakool.ca" else ""
         outmsg['To']      = recepient        
-        outmsg.attach(MIMEText(bdtxt[4], "plain"))
+        outmsg.attach(MIMEText(bdtxt[5], "plain"))
+        #Only has text inside
         extrfs = getAttch(rawmsg)
 
+        #Binding attachmentsss
         for extrf in extrfs:
             s3_response = s3.get_object(
-                            Bucket="walkkmailattch",
+                            Bucket=attchBuck,
                             Key=extrf
                           ) 
 
@@ -221,7 +221,7 @@ def sendEmail(  server, #"";  "smtp.mail.us-east-1.awsapps.com"
 
         print("Message ID:\n",
             ses.send_raw_email(
-            Source=sdr,
+            Source=bastionsdr,
             Destinations=[recepient],
             RawMessage={'Data': outmsg.as_string()}
             )
@@ -292,4 +292,4 @@ def sendEmail(  server, #"";  "smtp.mail.us-east-1.awsapps.com"
         print("\n***Failed on attchrepn***\n")  
         
  
-""" 
+"""          
