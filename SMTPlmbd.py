@@ -17,11 +17,15 @@ from email.mime.application import MIMEApplication
 
 s3 = boto3.client('s3')
 ses = boto3.client('ses')
+#Final destination pattern
+despattern = r"(---Final destination---)([\s\S]+)(---Final destination---)"
+#Body content pattern
+bdpattern = r"(---Final destination---)([\s\S]+)(---Final destination---)([\s\S]+)"
 
 def lambda_handler(event, context):
 
-    despattern = r"(---Final destination---)([\s\S]+)(---Final destination---)"
-    bdpattern = r"(---Final destination---)([\s\S]+)(---Final destination---)([\s\S]+)"
+    #despattern = r"(---Final destination---)([\s\S]+)(---Final destination---)"
+    #bdpattern = r"(---Final destination---)([\s\S]+)(---Final destination---)([\s\S]+)"
     fnldest = ''        #Final destination 
     bdtxt = ''          #Body content
     attch = []          #Attachment
@@ -33,69 +37,36 @@ def lambda_handler(event, context):
                 ).parsebytes(
                     response['Body'].read())
 
-    #Test cases
-    emailsrc  = getSrc(rawmsg)     
-    bdtxt     = getBody(rawmsg)
-    fnldest   = getDes(bdtxt, despattern) 
-
-    bdtxt     = re.search(bdpattern, 
-                          bdtxt
-                ) 
-
-    attchrepn = getAttch(rawmsg)
-    #Printing out contents in test cases 
-
-    try:
-        print("\n***Current object in walkkmail:***\n",
-          event['Records'][0]
-               ['s3']['object']
-               ['key'],
-          "\n***Current object in walkkmail:***\n"
-        )
-
-    except Exception as e:
-        print(f"***Current object enounter errors:\n",
-              f"{e}***\n"
-        )  
+    emailsrc  = getSrc(rawmsg) 
 
     try:
         
         print("\n***Email source***\n", 
                 emailsrc[2],
-              "\n***Email source***\n"
+              "\n^^^Email source^^^\n"
         ) 
 
     except:
-        print("\n***Failed on emailsrc[2]***\n") 
-
-    try:      
-        print("\n***Email plain content body***\n",
-               bdtxt[4],
-              "\n***Email plain content body***\n"
-        ) 
-
-    except:
-        print("\n***Failed on bdtxt[4]***\n")         
+        print("\n***Failed on emailsrc[2]***\n")                     
 
     try:
-        print("\n***Final destination***\n", 
-                fnldest[2],
-              "\n***Final destination***\n"
+        print("\n***Sending email***\n")
+
+        sendEmail(
+            "smtp.mail.us-east-1.awsapps.com",
+            465,
+            "walkk@walterkakool.ca",
+            rawmsg
+        )
+
+        print("\n^^^Email sent^^^\n")
+
+    except Exception as e:
+        print("\n***sendEmail errors***\n",
+                f"{e}",
+                "\n^^^sendEmail errors^^^\n"
         ) 
-
-    except:
-        print("\n***Failed on fnldest[2]***\n")         
-
-    try:
-        print("\n***Printing attchrepn return***\n", 
-                attchrepn,
-              "\n***Printing attchrepn return***\n"
-        ) 
-
-    except:
-        print("\n***Failed on attchrepn***\n")   
-
-                          
+         
 
 def getWalkkmailSpn(event):
     
@@ -107,6 +78,11 @@ def getWalkkmailSpn(event):
                           Bucket=bktname, 
                           Key=objkey
            ) 
+
+def getSub(rawmsg):
+
+    return rawmsg.get('Subject')
+
 
 def getBody(rawmsg):
     if rawmsg.is_multipart():
@@ -155,10 +131,10 @@ def getAttch(rawmsg):
                         filename = part.get_filename()
                         
                         if filename:
-                            print(f"Found attachment: {filename}")
+                            #print(f"Found attachment: {filename}")
                             extractionattch = part.get_content()
                             
-                            objkey = f"extracted/{os.path.basename(filename)}"
+                            objkey = f"{os.path.basename(filename)}"
                             
                             s3.put_object(
                                 Bucket="walkkmailattch",
@@ -166,9 +142,7 @@ def getAttch(rawmsg):
                                 Body=extractionattch
                             )
                             extracted_files.append(objkey)
-        else:
-            return "Email has no attachments."
-            #print("Email has no attachments.")
+
 
         returnstr  = "{\n"
         returnstr += "'Function':'getAttch'\n"
@@ -177,7 +151,8 @@ def getAttch(rawmsg):
         returnstr += f"{extracted_files}"
         returnstr += "\n}\n"
 
-        return returnstr
+        #return returnstr
+        return extracted_files
 
 
     except Exception as e:
@@ -197,37 +172,124 @@ def receiveEmail():
     return 0 
 
 
-def sendEmail(
-                server, #""
-                port,   #int
-                msg):
+def sendEmail(  server, #"";  "smtp.mail.us-east-1.awsapps.com" 
+                port,   #int; 465
+                sdr,    #"";  "walkk@walterkakool.ca"
+                rawmsg, #BytesParser
+):
+    inmsg       = rawmsg
+    emailsrc  = getSrc(inmsg)
 
-    srv          = server
-    prt          = port
-    sdr          = sender
-    sdpssw       = send_password
-    repnt        = recipient
-    txt          = text
+    outmsg = MIMEMultipart()
 
-    msg          = MIMEMultipart()
+    if emailsrc[2] == "walter.kakool@unb.ca":
 
-    smtp_server = "smtp.mail.us-east-1.awsapps.com" 
-    smtp_port = 465
-    sender_email = "walkk@walterkakool.ca"
-    sender_password = "" 
-    recipient_email = "walter.kakool@unb"
+        bdtxt     = getBody(inmsg)        #This has final destination
 
-    msg["From"] = sdr
-    msg["To"]   = sdr
-    msg["Subject"] = txt[0]
-    msg.attach(MIMEText(txt[1], "plain"))    #Only body text
+        fnldest   = getDes(bdtxt,
+                           despattern
+                    ) 
+
+        #No final destination inside
+        bdtxt     = re.search(bdpattern, 
+                              bdtxt
+                    )
+
+        outmsg['Subject'] = rawmsg.get('Subject')
+        outmsg['From']    = sdr
+        recepient         = fnldest[2][2:-2]
+        outmsg['To']      = recepient        
+        outmsg.attach(MIMEText(bdtxt[4], "plain"))
+        extrfs = getAttch(rawmsg)
+
+        for extrf in extrfs:
+            s3_response = s3.get_object(
+                            Bucket="walkkmailattch",
+                            Key=extrf
+                          ) 
+
+            pdf_content = s3_response['Body'].read()
+            attachment = MIMEApplication(pdf_content, Name=extrf)
+
+            attachment.add_header(
+                'Content-Disposition', 
+                'attachment', 
+                filename=extrf
+            )
+
+            outmsg.attach(attachment)
+
+        print("Message ID:\n",
+            ses.send_raw_email(
+            Source=sdr,
+            Destinations=[recepient],
+            RawMessage={'Data': outmsg.as_string()}
+            )
+        )
+
+"""
+    #Test cases
+    emailsrc  = getSrc(rawmsg)     
+    bdtxt     = getBody(rawmsg)
+    fnldest   = getDes(bdtxt, despattern) 
+
+    bdtxt     = re.search(bdpattern, 
+                          bdtxt
+                ) 
+
+    attchrepn = getAttch(rawmsg)
+    #Printing out contents in test cases 
 
     try:
-        ses.send_raw_email(
-            Source=sender_email,
-            Destinations=[recipient_email],
-            RawMessage={'Data': message.as_string()}
+        print("\n***Current object in walkkmail:***\n",
+          event['Records'][0]
+               ['s3']['object']
+               ['key'],
+          "\n^^^Current object in walkkmail^^^\n"
         )
 
     except Exception as e:
-        print(f"Error: {e}")                  
+        print(f"***Current object enounter errors:***\n",
+              f"{e}\n",
+              "^^^Current object enounter errors^^^\n"
+        )  
+
+    try:
+        
+        print("\n***Email source***\n", 
+                emailsrc[2],
+              "\n^^^Email source^^^\n"
+        ) 
+
+    except:
+        print("\n***Failed on emailsrc[2]***\n") 
+
+    try:      
+        print("\n***Email plain content body***\n",
+               bdtxt[4],
+              "\n^^^Email plain content body^^^\n"
+        ) 
+
+    except:
+        print("\n***Failed on bdtxt[4]***\n")         
+
+    try:
+        print("\n***Final destination***\n", 
+                fnldest[2],
+              "\n^^^Final destination^^^\n"
+        ) 
+
+    except:
+        print("\n***Failed on fnldest[2]***\n")         
+
+    try:
+        print("\n***Printing attchrepn return***\n", 
+                attchrepn,
+              "\n^^^Printing attchrepn return^^^\n"
+        ) 
+
+    except:
+        print("\n***Failed on attchrepn***\n")  
+        
+ 
+""" 
