@@ -1,5 +1,5 @@
 # Current ticket (regarding an online multi-players Blackjack mobile game)
-• Ver. AquariusSnake.\
+• Ver. AquariusSnake with bastion switch functionality.\
 • ~~Finished; Ver. AquariusMonk.~~\
 • ~~No mood for Jobless Science; backing to my study. Bisou bisou.~~\
 • ~~Trop paresseux pour nouvelle l'IU (UI in English); je prend mon script pour SMTP et IMAP en AWS;~~\
